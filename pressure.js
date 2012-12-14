@@ -307,12 +307,18 @@ function FluidField(canvas) {
     {
         rowSize = width + 2;
         size = (width+2)*(height+2);
-        dens = new Array(size);
-        dens_prev = new Array(size);
-        u = new Array(size);
-        u_prev = new Array(size);
-        v = new Array(size);
-        v_prev = new Array(size);
+		Module.freeFloat64Array(dens);
+		Module.freeFloat64Array(dens_prev);
+		Module.freeFloat64Array(u);
+		Module.freeFloat64Array(u_prev);
+		Module.freeFloat64Array(v);
+		Module.freeFloat64Array(v_prev);
+        dens = Module.newFloat64Array(size);
+        dens_prev = Module.newFloat64Array(size);
+        u = Module.newFloat64Array(size);
+        u_prev = Module.newFloat64Array(size);
+        v = Module.newFloat64Array(size);
+        v_prev = Module.newFloat64Array(size);
         for (var i = 0; i < size; i++)
             dens_prev[i] = u_prev[i] = v_prev[i] = dens[i] = u[i] = v[i] = 0;
     }
