@@ -38,7 +38,7 @@ function FluidField(canvas) {
                 x[i + (height+1) *rowSize] = x[i + height * rowSize];
             }
 
-            for (var j = 1; i <= height; i++) {
+            for (var j = 1; j <= height; j++) {
                 x[j * rowSize] = -x[1 + j * rowSize];
                 x[(width + 1) + j * rowSize] = -x[width + j * rowSize];
             }
@@ -199,7 +199,9 @@ function FluidField(canvas) {
         set_bnd(0, div);
         set_bnd(0, p);
         
-        lin_solve(0, p, div, 1, 4 );
+        // lin_solve(0, p, div, 1, 4 );
+		Module.solve(p, div);
+        set_bnd(0, p);
         var wScale = 0.5 * width;
         var hScale = 0.5 * height;
         for (var j = 1; j<= height; j++ ) {
@@ -321,6 +323,7 @@ function FluidField(canvas) {
         v_prev = Module.newFloat64Array(size);
         for (var i = 0; i < size; i++)
             dens_prev[i] = u_prev[i] = v_prev[i] = dens[i] = u[i] = v[i] = 0;
+		Module.initSolver(width,height);
     }
     this.reset = reset;
     this.setResolution = function (hRes, wRes)
