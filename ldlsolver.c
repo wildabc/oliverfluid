@@ -136,6 +136,16 @@ void initSolver(int width, int height){
 	printf("%d,%d,%g\n", Anz, Lp[N], (float)(end-begin)/CLOCKS_PER_SEC);
 }
 
+void getMatrices(void **p){
+	p[0] = Lp;
+	p[1] = Li;
+	p[2] = Lx;
+	p[3] = D;
+	p[4] = P;
+	p[5] = Pinv;
+	p[6] = (void *)N;
+}
+
 void solve(double *p, double *div){
 	for(int i = 0; i<SIZE; ++i){
 		p[i] += 1; 

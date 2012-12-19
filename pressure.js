@@ -200,7 +200,8 @@ function FluidField(canvas) {
         set_bnd(0, p);
         
         // lin_solve(0, p, div, 1, 4 );
-		Module.solve(p, div);
+		// Module.solve(p, div);
+        Module.jsolve(p, div,width,height);
         set_bnd(0, p);
         var wScale = 0.5 * width;
         var hScale = 0.5 * height;
@@ -324,6 +325,7 @@ function FluidField(canvas) {
         for (var i = 0; i < size; i++)
             dens_prev[i] = u_prev[i] = v_prev[i] = dens[i] = u[i] = v[i] = 0;
 		Module.initSolver(width,height);
+        Module.getMatrices();
     }
     this.reset = reset;
     this.setResolution = function (hRes, wRes)
