@@ -325,7 +325,7 @@ function FluidField(canvas) {
         for (var i = 0; i < size; i++)
             dens_prev[i] = u_prev[i] = v_prev[i] = dens[i] = u[i] = v[i] = 0;
 		Module.initSolver(width,height);
-        Module.getMatrices();
+        Module.getMatrices(width,height);
     }
     this.reset = reset;
     this.setResolution = function (hRes, wRes)

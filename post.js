@@ -3,39 +3,58 @@ Module.newFloat64Array = function(size){
 	var ptr = Module._malloc(numBytes);
     return new Float64Array(Module.HEAPU8.buffer, ptr, size);
 }
+
 Module.freeFloat64Array = function(array){
 	if(array !== undefined && 'byteOffset' in array){
 		Module._free(array.byteOffset);
 	}
 }
+
 Module.initSolver = Module.cwrap('initSolver','',['number','number']);
+
 Module.csolve = Module.cwrap('solve','',['number','number']);
+
 Module.solve = function(p, div){
 	Module.csolve(p.byteOffset, div.byteOffset);
 }
-Module.getMatrices = function(){
+
+Module.getMatrices = function(width,height){
 	var f = Module.cwrap('getMatrices', '', ['number']);
 	var ptr = Module._malloc(4*7);
 	var a = new Int32Array(Module.HEAPU8.buffer, ptr, 7);
 	f(ptr);
 	var N = a[6];
-	Lp = new Int32Array(Module.HEAPU8.buffer, a[0], N+1);
-	Li = new Int32Array(Module.HEAPU8.buffer, a[1], Lp[N]);
-	Lx = new Float64Array(Module.HEAPU8.buffer, a[2], Lp[N]);
-	D = new Float64Array(Module.HEAPU8.buffer, a[3], N);
-	P = new Int32Array(Module.HEAPU8.buffer, a[4], N);
-	Pinv = new Int32Array(Module.HEAPU8.buffer, a[5], N);
-}
-Module.jsolve = function(p, div, width, height){
+	Module.matrices = new Object();
+	Module.matrices.Lp = new Int32Array(Module.HEAPU8.buffer, a[0], N+1);
+	Module.matrices.Li = new Int32Array(Module.HEAPU8.buffer, a[1], Module.matrices.Lp[N]);
+	Module.matrices.Lx = new Float64Array(Module.HEAPU8.buffer, a[2], Module.matrices.Lp[N]);
+	Module.matrices.D = new Float64Array(Module.HEAPU8.buffer, a[3], N);
+	Module.matrices.P = new Int32Array(Module.HEAPU8.buffer, a[4], N);
+	Module.matrices.Pinv = new Int32Array(Module.HEAPU8.buffer, a[5], N);
+
+	var x2p = new Int32Array(N);
 	var k = 0;
 	var l = width+3;
-	var N = width*height-1;
-	var x = new Float64Array(N);
 	for(var j = 1 ; j <= height; j++){
 		for(var i = 1 ; i <= width; i++){
-			x[Pinv[k++]] = div[l++];
+			x2p[Module.matrices.Pinv[k++]] = l++;
 		}
 		l += 2;
+	}
+	Module.matrices.x2p = x2p;
+}
+
+Module.jsolve = function(p, div, width, height){
+	var Lp = Module.matrices.Lp;
+	var Li = Module.matrices.Li;
+	var Lx = Module.matrices.Lx;
+	var D = Module.matrices.D;
+	var x2p = Module.matrices.x2p;
+
+	var N = width*height-1;
+	var x = new Float64Array(N);
+	for(var k = 0 ; k < N; k++){
+			x[k] = div[x2p[k]];
 	}
 
 	for(var j = 0 ; j < N ; j++){
@@ -56,13 +75,8 @@ Module.jsolve = function(p, div, width, height){
 		}
 	}
 
-	k = 0;
-	l = width+3;
-	for(var j = 1 ; j <= height; j++){
-		for(var i = 1 ; i <= width; i++){
-			p[l++] = x[Pinv[k++]];
-		}
-		l += 2;
+	for(var k = 0 ; k < N; k++){
+			p[x2p[k]] = x[k];
 	}
-	p[width+1+(height+1)*(width+2)] = 0;
+	p[width+height*(width+2)] = 0;
 }
