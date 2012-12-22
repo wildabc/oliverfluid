@@ -200,8 +200,7 @@ function FluidField(canvas) {
         set_bnd(0, p);
         
         // lin_solve(0, p, div, 1, 4 );
-		// Module.solve(p, div);
-        Module.jsolve(p, div,width,height);
+        Module.solve(p, div,width,height);
         set_bnd(0, p);
         var wScale = 0.5 * width;
         var hScale = 0.5 * height;

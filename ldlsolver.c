@@ -30,9 +30,9 @@ if (p != (type *) NULL) \
 
 static int WIDTH, HEIGHT, N, SIZE;
 static int *Ap, *Ai, *Lp, *Li, *Parent, *Lnz, *Flag, *Pattern, *P, *Pinv;
-static double *Ax, *Lx, *D, *Y, *b, *x;
+static double *Ax, *Lx, *D, *Y;
 
-void initSolver(int width, int height){
+void constructMatrices(int width, int height){
 	WIDTH = width;
 	HEIGHT = height;
 	N = width*height-1;
@@ -40,30 +40,10 @@ void initSolver(int width, int height){
 
 	clock_t begin = clock();
 
-	// free all
-	FREE_MEMORY(Ap, int);
-	FREE_MEMORY(Ai, int);
-	FREE_MEMORY(Ax, double);
-	FREE_MEMORY(b, double);
-	FREE_MEMORY(x, double);
-	FREE_MEMORY(Parent, int);
-	FREE_MEMORY(Lnz, int);
-	FREE_MEMORY(Flag, int);
-	FREE_MEMORY(Lp, int);
-	FREE_MEMORY(Pattern, int);
-	FREE_MEMORY(P, int);
-	FREE_MEMORY(Pinv, int);
-	FREE_MEMORY(D, double);
-	FREE_MEMORY(Y, double);
-	FREE_MEMORY(Li, int);
-	FREE_MEMORY(Lx, double);
-
 	int Anz = 5*(width-2)*(height-2)+4*(width-2+height-2)*2+3*3-2;
 	ALLOC_MEMORY(Ap, int, N+1);
 	ALLOC_MEMORY(Ai, int, Anz);
 	ALLOC_MEMORY(Ax, double, Anz);
-	ALLOC_MEMORY(b, double, N);
-	ALLOC_MEMORY(x, double, N+1);	//plus one reduced unknown
 
 	// construct matix A
 	int p = 0, c, r, d;
@@ -137,7 +117,7 @@ void initSolver(int width, int height){
 }
 
 void getMatrices(int width, int height, void **p){
-	initSolver(width, height);
+	constructMatrices(width, height);
 
 	p[0] = Lp;
 	p[1] = Li;
@@ -146,4 +126,22 @@ void getMatrices(int width, int height, void **p){
 	p[4] = P;
 	p[5] = Pinv;
 	p[6] = (void *)N;
+}
+
+void freeMatrices(){
+	// free all
+	FREE_MEMORY(Ap, int);
+	FREE_MEMORY(Ai, int);
+	FREE_MEMORY(Ax, double);
+	FREE_MEMORY(Parent, int);
+	FREE_MEMORY(Lnz, int);
+	FREE_MEMORY(Flag, int);
+	FREE_MEMORY(Lp, int);
+	FREE_MEMORY(Pattern, int);
+	FREE_MEMORY(P, int);
+	FREE_MEMORY(Pinv, int);
+	FREE_MEMORY(D, double);
+	FREE_MEMORY(Y, double);
+	FREE_MEMORY(Li, int);
+	FREE_MEMORY(Lx, double);
 }

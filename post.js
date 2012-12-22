@@ -10,19 +10,12 @@ Module.freeFloat64Array = function(array){
 	}
 }
 
-// Module.initSolver = Module.cwrap('initSolver','',['number','number']);
-
-// Module.csolve = Module.cwrap('solve','',['number','number']);
-
-// Module.solve = function(p, div){
-// 	Module.csolve(p.byteOffset, div.byteOffset);
-// }
-
 Module.getMatrices = function(width,height){
-	var f = Module.cwrap('getMatrices', '', ['number','number','number']);
+	var getMatrices = Module.cwrap('getMatrices', '', ['number','number','number']);
+	var freeMatrices = Module.cwrap('freeMatrices', '', []);
 	var ptr = Module._malloc(4*7);
 	var a = new Int32Array(Module.HEAPU8.buffer, ptr, 7);
-	f(width,height,ptr);
+	getMatrices(width,height,ptr);
 	var N = a[6];
 	var matrices = new Object();
 	var Lp = new Int32Array(Module.HEAPU8.buffer, a[0], N+1);
@@ -50,12 +43,14 @@ Module.getMatrices = function(width,height){
 	}
 	matrices.x2p = x2p;
 
+	// clean up
 	Module._free(ptr);
+	freeMatrices();
 
 	return matrices;
 }
 
-Module.jsolve = function(p, div, width, height){
+Module.solve = function(p, div, width, height){
 	var Lp = selected.matrices.Lp;
 	var Li = selected.matrices.Li;
 	var Lx = selected.matrices.Lx;
