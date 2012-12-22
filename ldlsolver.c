@@ -136,7 +136,9 @@ void initSolver(int width, int height){
 	printf("%d,%d,%g\n", Anz, Lp[N], (float)(end-begin)/CLOCKS_PER_SEC);
 }
 
-void getMatrices(void **p){
+void getMatrices(int width, int height, void **p){
+	initSolver(width, height);
+
 	p[0] = Lp;
 	p[1] = Li;
 	p[2] = Lx;
@@ -144,31 +146,4 @@ void getMatrices(void **p){
 	p[4] = P;
 	p[5] = Pinv;
 	p[6] = (void *)N;
-}
-
-void solve(double *p, double *div){
-	for(int i = 0; i<SIZE; ++i){
-		p[i] += 1; 
-	}
-
-	for(int j=0; j<HEIGHT; ++j){
-		int j1 = j+1;
-		for(int i=0; i<WIDTH && IX(i,j)<N; ++i){
-			b[IX(i,j)] = div[i+1+(j1)*(WIDTH+2)];
-		}
-	}
-
-	ldl_perm(N, Y, b, P);
-	ldl_lsolve(N, Y, Lp, Li, Lx);
-	ldl_dsolve(N, Y, D);
-	ldl_ltsolve(N, Y, Lp, Li, Lx);
-	ldl_permt(N, x, Y, P);
-	x[N] = 0;
-
-	for(int j=0; j<HEIGHT; ++j){
-		int j1 = j+1;
-		for(int i=0; i<WIDTH; ++i){
-			p[i+1+(j1)*(WIDTH+2)] = x[IX(i,j)];
-		}
-	}
 }

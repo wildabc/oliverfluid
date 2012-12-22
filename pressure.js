@@ -308,24 +308,9 @@ function FluidField(canvas) {
     var displayFunc;
     function reset()
     {
-        rowSize = width + 2;
-        size = (width+2)*(height+2);
-		Module.freeFloat64Array(dens);
-		Module.freeFloat64Array(dens_prev);
-		Module.freeFloat64Array(u);
-		Module.freeFloat64Array(u_prev);
-		Module.freeFloat64Array(v);
-		Module.freeFloat64Array(v_prev);
-        dens = Module.newFloat64Array(size);
-        dens_prev = Module.newFloat64Array(size);
-        u = Module.newFloat64Array(size);
-        u_prev = Module.newFloat64Array(size);
-        v = Module.newFloat64Array(size);
-        v_prev = Module.newFloat64Array(size);
         for (var i = 0; i < size; i++)
             dens_prev[i] = u_prev[i] = v_prev[i] = dens[i] = u[i] = v[i] = 0;
-		Module.initSolver(width,height);
-        Module.getMatrices(width,height);
+        
     }
     this.reset = reset;
     this.setResolution = function (hRes, wRes)
@@ -334,6 +319,27 @@ function FluidField(canvas) {
         if (res > 0 && res < 1000000 && (wRes != width || hRes != height)) {
             width = wRes;
             height = hRes;
+
+            rowSize = width + 2;
+            size = (width+2)*(height+2);
+            Module.freeFloat64Array(dens);
+            Module.freeFloat64Array(dens_prev);
+            Module.freeFloat64Array(u);
+            Module.freeFloat64Array(u_prev);
+            Module.freeFloat64Array(v);
+            Module.freeFloat64Array(v_prev);
+            dens = Module.newFloat64Array(size);
+            dens_prev = Module.newFloat64Array(size);
+            u = Module.newFloat64Array(size);
+            u_prev = Module.newFloat64Array(size);
+            v = Module.newFloat64Array(size);
+            v_prev = Module.newFloat64Array(size);
+
+            selected = document.getElementById("resolution").selectedOptions[0];
+            if(selected.matrices === undefined){
+                selected.matrices = Module.getMatrices(width,height);
+            }
+
             reset();
             return true;
         }
