@@ -334,7 +334,8 @@ function FluidField(canvas) {
             v = Module.newFloat64Array(size);
             v_prev = Module.newFloat64Array(size);
 
-            selected = document.getElementById("resolution").selectedOptions[0];
+            var resSelection = document.getElementById("resolution");
+            selected = resSelection.options[resSelection.selectedIndex];
             if(selected.matrices === undefined){
                 selected.matrices = Module.getMatrices(width,height);
             }
