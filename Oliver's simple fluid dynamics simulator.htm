@@ -85,7 +85,6 @@
             window.onload=function(){
                 canvas = document.getElementById("canvas");
                 field = new FluidField(canvas);
-                document.getElementById("iterations").value = 10;
                 res = document.getElementById("resolution");
                 // res.value = options.res || "64";
                 field.setUICallback(prepareFrame);
@@ -132,7 +131,6 @@
         <table style="width: 100%;">
             <tr>
                 <td style="text-align: center"><h1>Oliver's simple fluid dynamics simulator</h1>
-                <div><b>If you like this, please also read <a href="ALC.html" style="color: green">Oliver's AIDS Life/Cycle page</a></b></div>
                 </td>
             </tr>
         </table>
@@ -152,8 +150,6 @@
                     <button onclick="stopAnimation()">stop</button>
                     <button onclick="field.reset(); frames = 0; sources = [];">reset</button><br />
                     <button onclick="field.setDisplayFunction(toggleDisplayFunction(canvas))">Toggle drawing mode</button><br />
-                    Solver Iterations:
-                    <input id=iterations type="range" onchange="field.setIterations(event.target.value)" min=1 max=75><br />
                     Resolution:
                     <select id=resolution onchange="updateRes()">
                         <option>64</option>
