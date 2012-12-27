@@ -22,26 +22,27 @@ Module.getMatrices = function(width,height){
 	var Li = new Int32Array(Module.HEAPU8.buffer, a[1], Lp[N]);
 	var Lx = new Float64Array(Module.HEAPU8.buffer, a[2], Lp[N]);
 	var D = new Float64Array(Module.HEAPU8.buffer, a[3], N);
-	var P = new Int32Array(Module.HEAPU8.buffer, a[4], N);
+	// var P = new Int32Array(Module.HEAPU8.buffer, a[4], N);	//never used
 	var Pinv = new Int32Array(Module.HEAPU8.buffer, a[5], N);
 	//copy arrays out
 	matrices.Lp = new Int32Array(Lp);
 	matrices.Li = new Int32Array(Li);
 	matrices.Lx = new Float64Array(Lx);
 	matrices.D = new Float64Array(D);
-	matrices.P = new Int32Array(P);
-	matrices.Pinv = new Int32Array(Pinv);
+	// matrices.P = new Int32Array(P);	//never used
+	// matrices.Pinv = new Int32Array(Pinv);	//never used
 
 	var x2p = new Int32Array(N);
 	var k = 0;
 	var l = width+3;
 	for(var j = 1 ; j <= height; j++){
 		for(var i = 1 ; i <= width; i++){
-			x2p[matrices.Pinv[k++]] = l++;
+			x2p[Pinv[k++]] = l++;
 		}
 		l += 2;
 	}
 	matrices.x2p = x2p;
+	matrices.x = new Float64Array(N);
 
 	// clean up
 	Module._free(ptr);
@@ -56,9 +57,10 @@ Module.solve = function(p, div, width, height){
 	var Lx = selected.matrices.Lx;
 	var D = selected.matrices.D;
 	var x2p = selected.matrices.x2p;
+	var x = selected.matrices.x;
 
 	var N = width*height-1;
-	var x = new Float64Array(N);
+
 	for(var k = 0 ; k < N; k++){
 			x[k] = div[x2p[k]];
 	}

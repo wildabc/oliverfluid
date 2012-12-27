@@ -79,14 +79,14 @@
             }
             var options = {};
             try {
-                options = JSON.parse(location.search.substring(1));
+                options.res = JSON.parse(location.search.substring(1));
             } catch(e) {
             }
             window.onload=function(){
                 canvas = document.getElementById("canvas");
                 field = new FluidField(canvas);
                 res = document.getElementById("resolution");
-                // res.value = options.res || "64";
+                res.value = options.res || "64";
                 field.setUICallback(prepareFrame);
                 updateRes = function() {
                     var r = parseInt(res.value);
@@ -152,12 +152,12 @@
                     <button onclick="field.setDisplayFunction(toggleDisplayFunction(canvas))">Toggle drawing mode</button><br />
                     Resolution:
                     <select id=resolution onchange="updateRes()">
-                        <option>64</option>
                         <option>8</option>
                         <option>16</option>
                         <option>24</option>
                         <option>32</option>
                         <option>48</option>
+                        <option>64</option>
                         <option>96</option>
                         <option>128</option>
                         <option>256</option>
