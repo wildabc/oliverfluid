@@ -347,4 +347,3 @@ function FluidField(canvas) {
     }
     // this.setResolution(64, 64);
 }
-

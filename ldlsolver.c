@@ -113,7 +113,7 @@ void constructMatrices(int width, int height){
 	ldl_numeric(N, Ap, Ai, Ax, Lp, Parent, Lnz, Li, Lx, D, Y, Flag, Pattern, P, Pinv);
 
 	clock_t end = clock();
-	printf("%d,%d,%g\n", Anz, Lp[N], (float)(end-begin)/CLOCKS_PER_SEC);
+	printf("%d*%d: NNZ of A:%d; NNZ of L:%d; time of construction:%gs.\n", width, height, Anz, Lp[N]+N, (float)(end-begin)/CLOCKS_PER_SEC);
 }
 
 void getMatrices(int width, int height, void **p){
