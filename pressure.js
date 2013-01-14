@@ -180,6 +180,107 @@ function FluidField(canvas) {
         }
         set_bnd(b, d);
     }
+
+    function advectMacCormack(b, d, d0, u, v, dt)
+    {
+        var Wdt0 = dt * width;
+        var Hdt0 = dt * height;
+        var Wp5 = width + 0.5;
+        var Hp5 = height + 0.5;
+        var outside = new Array(size);
+        for (var i = 0; i < size; i++) {
+            outside[i] = false;
+        }
+        var dhat0 = new Float64Array(size);
+        var dhat = new Float64Array(size);
+        var dmin = new Float64Array(size);
+        var dmax = new Float64Array(size);
+
+        for (var j = 1; j<= height; j++) {
+            var pos = j * rowSize;
+            for (var i = 1; i <= width; i++) {
+                var x = i - Wdt0 * u[++pos]; 
+                var y = j - Hdt0 * v[pos];
+                if (x<1 || x>width || y<1 || y>height){
+                    outside[pos] = true;
+                }
+                if (x < 0.5)
+                    x = 0.5;
+                else if (x > Wp5)
+                    x = Wp5;
+                var i0 = x | 0;
+                var i1 = i0 + 1;
+                if (y < 0.5)
+                    y = 0.5;
+                else if (y > Hp5)
+                    y = Hp5;
+                var j0 = y | 0;
+                var j1 = j0 + 1;
+                var s1 = x - i0;
+                var s0 = 1 - s1;
+                var t1 = y - j0;
+                var t0 = 1 - t1;
+                var row1 = j0 * rowSize;
+                var row2 = j1 * rowSize;
+                var d00 = d0[i0 + row1];
+                var d01 = d0[i0 + row2];
+                var d10 = d0[i1 + row1];
+                var d11 = d0[i1 + row2];
+                // dhat[pos] = s0 * (t0 * d0[i0 + row1] + t1 * d0[i0 + row2]) + s1 * (t0 * d0[i1 + row1] + t1 * d0[i1 + row2]);
+                dhat[pos] = s0 * (t0 * d00 + t1 * d01) + s1 * (t0 * d10 + t1 * d11);
+                dmin[pos] = Math.min(d00, d01, d10, d11);
+                dmax[pos] = Math.max(d00, d01, d10, d11);
+            }
+        }
+
+        for (var j = 1; j<= height; j++) {
+            var pos = j * rowSize;
+            for (var i = 1; i <= width; i++) {
+                if(outside[++pos]){
+                    continue;
+                }
+                var x = i + Wdt0 * u[pos]; 
+                var y = j + Hdt0 * v[pos];
+                if (x<1 || x>width || y<1 || y>height){
+                    outside[pos] = true;
+                }
+                if (x < 0.5)
+                    x = 0.5;
+                else if (x > Wp5)
+                    x = Wp5;
+                var i0 = x | 0;
+                var i1 = i0 + 1;
+                if (y < 0.5)
+                    y = 0.5;
+                else if (y > Hp5)
+                    y = Hp5;
+                var j0 = y | 0;
+                var j1 = j0 + 1;
+                var s1 = x - i0;
+                var s0 = 1 - s1;
+                var t1 = y - j0;
+                var t0 = 1 - t1;
+                var row1 = j0 * rowSize;
+                var row2 = j1 * rowSize;
+                dhat0[pos] = s0 * (t0 * dhat[i0 + row1] + t1 * dhat[i0 + row2]) + s1 * (t0 * dhat[i1 + row1] + t1 * dhat[i1 + row2]);
+            }
+        }
+
+        for (var j = 1; j<= height; j++) {
+            var pos = j * rowSize;
+            for (var i = 1; i <= width; i++) {
+                if(outside[++pos]){
+                    d[pos] = dhat[pos];
+                }
+                else{
+                    d[pos] = Math.min(Math.max(dhat[pos] + (d0[pos]-dhat0[pos])/2, dmin[pos]), dmax[pos]);
+                    // d[pos] = dhat[pos] + (d0[pos]-dhat0[pos])/2;
+                }
+            }
+        }
+
+        set_bnd(b, d);
+    }
     
     function project(u, v, p, div)
     {
@@ -225,7 +326,7 @@ function FluidField(canvas) {
     {
         addFields(x, x0, dt);
         diffuse(0, x0, x, dt );
-        advect(0, x, x0, u, v, dt );
+        advectMacCormack(0, x, x0, u, v, dt );
     }
     
     function vel_step(u, v, u0, v0, dt)
@@ -238,8 +339,8 @@ function FluidField(canvas) {
         project(u, v, u0, v0);
         var temp = u0; u0 = u; u = temp; 
         var temp = v0; v0 = v; v = temp;
-        advect(1, u, u0, u0, v0, dt);
-        advect(2, v, v0, u0, v0, dt);
+        advectMacCormack(1, u, u0, u0, v0, dt);
+        advectMacCormack(2, v, v0, u0, v0, dt);
         project(u, v, u0, v0 );
     }
     var uiCallback = function(d,u,v) {};
