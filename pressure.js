@@ -243,6 +243,7 @@ function FluidField(canvas) {
                 var y = j + Hdt0 * v[pos];
                 if (x<1 || x>width || y<1 || y>height){
                     outside[pos] = true;
+                    continue;
                 }
                 if (x < 0.5)
                     x = 0.5;
