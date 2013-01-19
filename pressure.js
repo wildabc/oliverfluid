@@ -327,7 +327,7 @@ function FluidField(canvas) {
     {
         addFields(x, x0, dt);
         diffuse(0, x0, x, dt );
-        advectMacCormack(0, x, x0, u, v, dt );
+        advect(0, x, x0, u, v, dt );
     }
     
     function vel_step(u, v, u0, v0, dt)
