@@ -189,3 +189,31 @@ void freeMatrices(){
 	FREE_MEMORY(Li, int);
 	FREE_MEMORY(Lx, double);
 }
+
+#ifdef MAIN
+int main(int argc, char const *argv[])
+{
+	int n1;
+	printf("N*N grid. N=? \n");
+    scanf("%d", &n1);
+	constructMatrices(n1, n1);
+	double *x;
+	ALLOC_MEMORY(x, double, N);
+	for(int i=0; i<N; ++i){
+		x[i] = rand()/(float)RAND_MAX;
+	}
+
+	clock_t begin = clock();
+	ldl_perm(N, Y, x, P);
+	ldl_lsolve(N, Y, Lp, Li, Lx);
+	ldl_dsolve(N, Y, D);
+	ldl_ltsolve(N, Y, Lp, Li, Lx);
+	ldl_permt(N, x, Y, P);
+	clock_t end = clock();
+	printf("Triangular solver time: %f\n", (float)(end-begin)/CLOCKS_PER_SEC);
+
+	freeMatrices();
+	FREE_MEMORY(x, double);
+	return 0;
+}
+#endif
