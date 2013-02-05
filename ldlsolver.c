@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include <time.h>
 #include "ldl.h"
 #include "amd.h"
+#include "camd.h"
 
 /* ---------Macros borrowed from ldl demo------------------------------------ */
 /* -------------------------------------------------------------------------- */
@@ -32,6 +34,41 @@ static int WIDTH, HEIGHT, N, SIZE;
 static int *Ap, *Ai, *Lp, *Li, *Parent, *Lnz, *Flag, *Pattern, *P, *Pinv;
 static double *Ax, *Lx, *D, *Y;
 
+void diamondConstraint(int *C, int n){
+	if(WIDTH != HEIGHT){	//It is only for square grid now.
+		for(int j=0; j<HEIGHT; ++j){
+			for(int i=0; i<WIDTH; ++i){
+				C[IX(i,j)] = 0;
+			}
+		}
+		return;
+	}
+
+	int *seps;	//separators
+	ALLOC_MEMORY(seps, int, 2*n);
+	float seps0 = WIDTH/n/2;
+	seps[0] = floor(seps0);
+	for(int i=1; i<n; ++i){
+		seps[i] = floor(seps0+WIDTH/n*i);
+	}
+	for(int i=n; i<2*n; ++i){
+		seps[i] = 2*(WIDTH-1)-seps[2*n-1-i];
+	}
+	for(int j=0; j<HEIGHT; ++j){
+		for(int i=0; i<WIDTH; ++i){
+			C[IX(i,j)] = 0;
+			int d1 = i+j;
+			int d2 = WIDTH-1-i+j;
+			for(int k=0; k<2*n; ++k){
+				if((d1==seps[k]) || (d2==seps[k])){
+					C[IX(i,j)] = 1;
+					break;
+				}
+			}
+		}
+	}
+	FREE_MEMORY(seps, int);
+}
 void constructMatrices(int width, int height){
 	WIDTH = width;
 	HEIGHT = height;
@@ -106,7 +143,14 @@ void constructMatrices(int width, int height){
 	ALLOC_MEMORY(Y, double, N);
 
 	// LDL factorization
-	amd_order(N, Ap, Ai, P, NULL, NULL);
+	int *C;
+	ALLOC_MEMORY(C, int, N+1);
+	if(width>64){
+		diamondConstraint(C, 8);
+	}
+	camd_order(N, Ap, Ai, P, NULL, NULL, C);
+	FREE_MEMORY(C, int);
+
 	ldl_symbolic(N, Ap, Ai, Lp, Parent, Lnz, Flag, P, Pinv);
 	ALLOC_MEMORY(Li, int, Lp[N]);
 	ALLOC_MEMORY(Lx, double, Lp[N]);
