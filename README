@@ -1,1 +1,2 @@
 Modified from http://nerget.com/fluidSim/
+Cholesky factorization is used to solve Poisson equation.
